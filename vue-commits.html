@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Vue commits information</title>
+	<style type="text/css">
+		#demo {
+			font-family: 'Helvetica', Arial, sans-serif;
+		}
+
+		a {
+			text-decoration: none;
+			color: #f66;
+		}
+
+		li {
+			line-height: 1.5em;
+			margin-bottom: 20px;
+		}
+
+		.author, .date {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+<div id="demo">
+	<h1>Latest Vue.js Commits</h1>
+	<template v-for="branch in branches">
+		<input type="radio" v-bind:id="branch"
+			   v-bind:value="branch" name="branch"
+			   v-model="currentBranch">
+		<label v-bind:for="branch">{{ branch }}</label>
+	</template>
+	<p>vuejs/vue@{{ currentBranch }}</p>
+	<ul>
+		<li v-for="record in commits">
+			<a v-bind:href="record.html_url" target="_black" class="commit">
+				{{ record.sha.slice(0,7) }}
+			</a>
+			-<span class="message">{{ record.commit.message | truncate }}</span><br>
+			by<span class="author">
+				<a href="record.author.html_url" target="_black">
+					{{ record.commit.author.name }}
+				</a>
+			</span>
+			at<span class="date">{{ record.commit.author.date | formatDate }}</span>
+		</li>
+	</ul>
+</div>
+
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script>
+	var apiURL = 'https://api.github.com/repos/vuejs/vue/commits?per_page=3&sha=';
+
+	var demo = new Vue({
+		el: "#demo",
+		data: {
+			branches: ['master', 'dev'],
+			currentBranch: 'master',
+			commits: null
+		},
+		created: function () {
+			this.fetchDate();
+		},
+		watch: {
+			currentBranch: 'fetchDate'
+		},
+		filters: {
+			truncate: function (v) {
+				var newline = v.indexOf('\n');
+				return newline > 0 ? v.slice(0, newline) : v;
+			},
+			formatDate: function (v) {
+				return v.replace(/T|Z/g, ' ');
+			}
+		},
+		methods: {
+			fetchDate: function () {
+				var xhr = new XMLHttpRequest();
+				var self = this;
+				xhr.open('GET', apiURL + self.currentBranch);
+				xhr.onload = function () {
+					self.commits = JSON.parse(xhr.responseText);
+					console.log(self.commits[0].html_url);
+				};
+				xhr.send();
+			}
+		}
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>VueJs Tutorial - coligo</title>
+</head>
+<body>
+
+<div id="vue-instance">
+	Enter a greeting: <input type="text" v-model="greeting">
+	<p>{{ greeting }}</p>
+	Enter your name: <input type="text" v-model="name">
+	<button v-on:click="sayHello">Hey there!</button>
+	<hr />
+	<div v-if="isLoggedIn">
+		Welcome to coligo!
+		<button @click="login" type="submit">Logout</button>
+	</div>
+	<div v-else>
+		<input type="text" placeholder="username">
+		<input type="password" placeholder="password">
+		<button @click="login" type="submit">Login</button>
+	</div>
+	<ul>
+		<li v-for="item in inventory">
+			{{ item.name }} - ${{ item.price }}
+		</li>
+		<li v-for="(item, index) in inventory">
+			{{ index }} - {{ item.name }} - {{ item.price }}
+		</li>
+	</ul>
+	<p>输入半径，计算圆的面积：</p>
+	radius: <input type="number" v-model="x">
+	area: {{ doubleX }}
+	<hr>
+	Guess a number between 1 and 10: <input type="number" v-model="userInput">
+	<b>{{ message }}</b>
+</div>
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script type="text/javascript">
+	var vm = new Vue ({
+		el: '#vue-instance',
+		data: {
+			greeting: 'hello vuejs!',
+			name: '',
+			isLoggedIn: false,
+			inventory: [
+				{name: 'MacBook Air', price: 1000},
+				{name: 'MacBook Pro', price: 1800},
+				{name: 'Lenovo W530', price: 1400},
+				{name: 'Acer Aspore', price: 1300}
+			],
+			x: 1,
+			userInput: 0,
+			randomNumber: 0
+		},
+		methods: {
+			sayHello: function () {
+				alert('Hey there, ' + this.name);
+			},
+			login: function () {
+				this.isLoggedIn = !this.isLoggedIn;
+			},
+			getRandomNumber: function(min, max) {
+				return Math.floor(Math.random() * (max - min + 1)) + min;
+			}
+		},
+		computed: {
+			doubleX: function() {
+				return this.x * this.x * 3.14;
+			},
+			message: function() {
+				if (this.userInput == this.randomNumber) {
+					this.randomNumber = this.getRandomNumber(1, 10);
+					return 'You got it right!';
+				} else {
+					this.randomNumber = this.getRandomNumber(1, 10);
+					return 'Try again!';
+				}
+			}
+		}
+	});
+</script>
+</body>
+</html>

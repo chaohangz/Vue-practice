@@ -1,0 +1,264 @@
+<!-- Vue.js2.0 中文文档 -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Vue 入门</title>
+</head>
+
+<body>
+    <div id="app">
+        <p>{{ message }}<p>
+        <p v-bind:title="hover">
+            Hover your mouse over me for a few seconds to see my dynamically bound title!
+        </p>
+        <p v-if="seen">Now you see me</p>
+        <ol>
+            <li v-for="todo in todos">{{ todo.text }}</li>
+        </ol>
+        <hr>
+        <p>{{ reverse }}</p>
+        <button v-on:click="reverseMessage">Reverse Message</button>
+        <p>Original message: "{{ message }}"</p>
+        <p>Computed reversed message: "{{ reversedMessage }}"</p>
+        <hr>
+        <p>{{ input }}</p>
+        <input v-model="input">
+        <hr>
+        <todo-item v-for="todo in todos" v-bind:todo="todo"></todo-item>
+        <div v-html="rawHtml"></div>
+        <hr>
+        <div>first name: {{ firstName }}</div>
+        <div>last name: {{ lastName }}</div>
+        <div>full name: {{ fullName }}</div>
+        input your first name: <input v-model="firstName">
+        <br>
+        input your last name: <input v-model="lastName">
+        <hr>
+        <div v-bind:style="styleObject">style object</div>
+        <h3>show and if </h3>
+        <p v-if="true">true if</p>
+        <p v-if="false">false if</p>
+        <p v-show="true">true show</p>
+        <p v-show="false">false show</p>
+        <span v-for="n in 10">{{ n }}, </span>
+        <hr>
+        <p>
+            <button v-on:click="greet">Greet</button>
+            <button v-on:click="say('hi')">Say Hi</button>
+            <button v-on:click="say('what')">Say What</button>
+        </p>
+        <h3>访问原生DOM事件</h3>
+        <button v-on:click.prevent="warn('Form cannot be submitted yet.', $event)">submit</button>
+        <hr>
+        <h3>表单控件</h3>
+        <p>
+            <input type="checkbox" id="checkbox" v-model="checked">
+            <label for="checkbox">{{ checked }}</label>
+        </p>
+        <p>
+            <input type="checkbox" id="jack" value="Jack" v-model="checkedNames">
+            <label for="jack">Jack</label>
+            <input type="checkbox" id="john" value="John" v-model="checkedNames">
+            <label for="John">John</label>
+            <input type="checkbox" id="mike" value="Mike" v-model="checkedNames">
+            <label for="mike">Mike</label>
+            <br>
+            <span>Checked names: {{ checkedNames }}</span>
+        </p>
+        <p>
+            <input type="radio" id="one" value="One" v-model="picked">
+            <label for="one">One</label>
+            <br>
+            <input type="radio" id="two" value="Two" v-model="picked">
+            <label for="two">Two</label>
+            <br>
+            <span>Picked: {{ picked }}</span>
+        </p>
+        <hr>
+        <p>
+            <select v-model="selected">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+            <span>Selected: {{ selected }}</span>
+        </p>
+        <p>
+            <select v-model="selected2" multiple>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+            <br>
+            <span>Selected: {{ selected2 }}</span>
+        </p>
+        <hr>
+        <h3>动态选项</h3>
+        <select v-model="selected3">
+            <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+            </option>
+        </select>
+        <span>Selected: {{ selected3 }}</span>
+        <hr>
+        <h3>组件 component</h3>
+        <my-component></my-component>
+        <p>
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+            <simple-counter></simple-counter>
+        </p>
+        <p>
+            <simple-counter2></simple-counter2>
+            <simple-counter2></simple-counter2>
+            <simple-counter2></simple-counter2>
+        </p>
+        <hr>
+        <h3>事件的监听和触发</h3>
+        <p>{{ total }}</p>
+        <button-counter v-on:increment="incrementTotal"></button-counter>
+        <button-counter v-on:increment="incrementTotal"></button-counter>
+    </div>
+</body>
+
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script>
+    //component 要放在data的上面
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<li>{{ todo.text }}</li>'
+    });
+
+    Vue.component('my-component', {
+        template: '<div>A custom component!</div>'
+    });
+
+    var data = { counter: 0 };
+    Vue.component('simple-counter', {
+        template: '<button v-on:click="counter += 1">{{ counter }}</button>',
+        //data必须是一个函数
+        data: function () {
+            // 直接返回data
+            //此时的data对象为全局变量
+            //三个标签共享
+            return data;
+        }
+    });
+
+    Vue.component('button-counter', {
+        template: '<button v-on:click="increment">{{ counter }}</button>',
+        data: function () {
+            return {
+                counter: 0
+            };
+        },
+        methods: {
+            increment: function () {
+                this.counter += 1;
+                this.$emit('increment');
+            }
+        }
+    });
+
+    Vue.component('simple-counter2', {
+        template: '<button v-on:click="counter += 1">{{ counter }}</button>',
+        //data必须是一个函数
+        data: function () {
+            //返回一个单独的对象
+            return {
+                counter: 0
+            };
+        }
+    });
+
+    var app = new Vue({
+        el: '#app',
+
+        data: {
+            message: 'Hello Vue!',
+            hover: 'You loaded this page on ' + new Date(),
+            seen: true,
+            todos: [
+                {text: 'learn JavaScript'},
+                {text: 'learn Vue'},
+                {text: 'Build something awesome'}
+            ],
+            reverse: 'Hello Vue.js!',
+            input: 'hello',
+            rawHtml: '<p>This is html string</p>',
+            firstName: 'Foo',
+            lastName: 'Bar',
+            // fullName: 'Foo Bar'
+            styleObject: {
+                color: 'red',
+                fontSize: '13px'
+            },
+            checked: false,
+            checkedNames: [],
+            picked: '',
+            selected: '',
+            selected2: [],
+            selected3: 'A',
+            options: [
+                { text: 'One', value: 'A' },
+                { text: 'Two', value: 'B' },
+                { text: 'Three', value: 'C' },
+            ],
+            total: 0
+        },
+
+        methods: {
+            reverseMessage: function () {
+                this.reverse = this.reverse.split('').reverse().join('');
+            },
+            greet: function (event) {
+                alert(this.message);
+                alert(event.target.tagName);
+            },
+            say: function (message) {
+                alert(message);
+            },
+            warn: function (message, event) {
+                //现在我们可以访问原生事件对象
+                if (event)
+                    alert(message);
+            },
+            incrementTotal: function () {
+                this.total += 1;
+            }
+        },
+
+        computed: {
+            reversedMessage: function() {
+                return this.message.split('').reverse().join('');
+            },
+            fullName: {
+                //getter
+                get: function () {
+                    return this.firstName + ' ' + this.lastName;
+                },
+                //setter
+                set: function (newValue) {
+                    var names = newValue.split(' ');
+                    this.firstName = names[0];
+                    this.lastName = names[names.length - 1];
+                }
+            }
+        },
+
+        //与computed做对比
+        // watch: {
+        //     firstName: function (val) {
+        //         this.fullName = val + ' ' + this.lastName;
+        //     },
+        //     lastName: function (val) {
+        //         this.fullName = this.firstName + ' ' + val;
+        //     }
+        // }
+    });
+
+</script>
+
+</html>
